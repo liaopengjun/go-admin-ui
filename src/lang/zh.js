@@ -1,5 +1,12 @@
 export default {
   route: {
+    administrator: '超级管理员',
+    menu: '菜单管理',
+    auth: '角色管理',
+    user: '用户管理',
+    api: 'Api管理',
+    log: '日志管理',
+    loginLog: '登陆日志',
     dashboard: '首页',
     documentation: '文档',
     guide: '引导页',

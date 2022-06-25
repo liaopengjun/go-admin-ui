@@ -17,8 +17,10 @@ import i18n from './lang' // internationalization
 import './icons' // icon
 import './permission' // permission control
 import './utils/error-log' // error log
+import permission from './directive/permission'
 
 import * as filters from './filters' // global filters
+import { parseTime, resetForm } from '@/utils/costum'
 
 /**
  * If you don't want to use mock-server
@@ -44,6 +46,22 @@ Object.keys(filters).forEach(key => {
 })
 
 Vue.config.productionTip = false
+Vue.prototype.parseTime = parseTime
+Vue.prototype.resetForm = resetForm
+
+Vue.prototype.msgSuccess = function(msg) {
+  this.$message({ showClose: true, message: msg, type: 'success' })
+}
+
+Vue.prototype.msgError = function(msg) {
+  this.$message({ showClose: true, message: msg, type: 'error' })
+}
+
+Vue.prototype.msgInfo = function(msg) {
+  this.$message.info(msg)
+}
+
+Vue.use(permission)
 
 new Vue({
   el: '#app',

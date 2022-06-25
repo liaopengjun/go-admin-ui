@@ -3,6 +3,7 @@ import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
 const state = {
+  userid: '',
   token: getToken(),
   name: '',
   avatar: '',
@@ -11,6 +12,9 @@ const state = {
 }
 
 const mutations = {
+  SET_USERID: (state, userid) => {
+    state.userid = userid
+  },
   SET_TOKEN: (state, token) => {
     state.token = token
   },
@@ -36,6 +40,7 @@ const actions = {
       login({ username: username.trim(), password: password }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
+        commit('SET_USERID', data.userid)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -47,26 +52,24 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
-
         if (!data) {
-          reject('Verification failed, please Login again.')
+          reject('获取用户信息失败.')
         }
 
-        const { roles, name, avatar, introduction } = data
-
+        const { authorities, userName, headerImg } = data
         // roles must be a non-empty array
-        if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+        if (!authorities || authorities.length <= 0) {
+          reject('用户角色返回值不正确')
         }
-
-        commit('SET_ROLES', roles)
-        commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
-        commit('SET_INTRODUCTION', introduction)
+        commit('SET_ROLES', authorities)
+        commit('SET_NAME', userName)
+        commit('SET_AVATAR', process.env.VUE_APP_BASE_API + '/' + headerImg)
+        commit('SET_INTRODUCTION', '')
         resolve(data)
       }).catch(error => {
+        console.log(error)
         reject(error)
       })
     })
@@ -76,11 +79,12 @@ const actions = {
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
+        commit('SET_USERID', '')
         commit('SET_TOKEN', '')
         commit('SET_ROLES', [])
         removeToken()
         resetRouter()
-
+        location.reload()
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485
         dispatch('tagsView/delAllViews', null, { root: true })
@@ -95,6 +99,7 @@ const actions = {
   // remove token
   resetToken({ commit }) {
     return new Promise(resolve => {
+      commit('SET_USERID', '')
       commit('SET_TOKEN', '')
       commit('SET_ROLES', [])
       removeToken()
