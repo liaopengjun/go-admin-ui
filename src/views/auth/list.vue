@@ -69,6 +69,7 @@
             @click="handleUpdate(scope.row.authorityId)"
           >修改</el-button>
           <el-button
+            v-if="(scope.row.authorityId !=1)"
             v-permission="['api:authority:deleteAuthority']"
             size="mini"
             type="text"
